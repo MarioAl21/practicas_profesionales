@@ -62,7 +62,14 @@ export const PokeTable = () => {
 
   getPokemon();
 }, []);
-
+;
+ const handleMoveToWild = (pokemon) => {
+  const updatedAvailablePokemon = [...trappedPokemon];
+  const pokemonIndex = updatedAvailablePokemon.findIndex(p => p.id === pokemon.id);
+  const movedPokemon = updatedAvailablePokemon.splice(pokemonIndex, 1)[0];
+  setAvailablePokemon((prevPendingPokemon) => [...prevPendingPokemon, movedPokemon]);
+  setTrappedPokemon(updatedAvailablePokemon);
+ }
  const handleMoveToPending =  (pokemon) => {
   const updatedAvailablePokemon = [...availablePokemon];
   const pokemonIndex = updatedAvailablePokemon.findIndex(p => p.id === pokemon.id);
@@ -70,64 +77,85 @@ export const PokeTable = () => {
   setPendingPokemon((prevPendingPokemon) => [...prevPendingPokemon, movedPokemon]);
   setAvailablePokemon(updatedAvailablePokemon);
  };
- const handleMoveToTrappend = (pokemon) => {
-  alert('Pokemon TRAPPED!');
+ const handleMoveToTrapped = (pokemon) => {
+  const updatedAvailablePokemon = [...pendingPokemon];
+  const pokemonIndex = updatedAvailablePokemon.findIndex(p => p.id === pokemon.id);
+  const movedPokemon = updatedAvailablePokemon.splice(pokemonIndex, 1)[0];
+  setTrappedPokemon((prevPendingPokemon) => [...prevPendingPokemon, movedPokemon]);
+  setPendingPokemon(updatedAvailablePokemon);
  }
 
  return(
   <div>
+
+   
+<i
+    className="fas fa-cat"
+    style={{
+      position: 'absolute',
+      right: '10px',
+      bottom: '10px',
+      cursor: 'pointer',
+    }}
+    onClick={() => handleSearch()}
+  ></i>
+
    <input 
     type             = 'text'
     placeholder = 'Search Pokemon...'
     value           = { searchedPokemon }
     onChange    = { e => setSearchedPokemon(e.target.value)  } 
-    style            = {{ marginBottom: '10px', padding: '5px' }}
+    style={{
+     marginBottom: '10px',
+     padding: '5px',
+     border: 'none',
+     borderBottom: '2px solid #ccc',
+     outline: 'none',
+    }}
    />
 
-   <table style={{ width: '100%', borderCollapse: 'collapse' }} >
-    <thead>
-     <tr>
-      <th style={tableHeaderStyle} >Available Pokemon</th>
-      <th style={tableHeaderStyle}>Pending to Capture</th>
-      <th style={tableHeaderStyle}>Trapped Pokemon</th>
-     </tr>
-    </thead>
-    <tbody>
-     
-            {currentPokemon.map((pokemon, currentIndex) => (
-            <tr key={currentIndex}>
-              <td style={columnStyle}>
-                {pokemon.id} {pokemon.name}
+
+  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
+    <div>
+     <h2>Wild Pokemon</h2>
+      {currentPokemon.map( (pokemon, currentIndex) => (
+            <div key={currentIndex}> 
+                {pokemon.name}
                 <img src={pokemon.image} alt={pokemon.name} style={{ width: '50px', height: '50px' }} />
                 <br />
-                <button onClick={() => handleMoveToPending(pokemon)}>I want it!</button>
-              </td>
-              <td style={columnStyle}>
-                {pendingPokemon &&
-                  pendingPokemon.length > 0 &&
-                  pendingPokemon.map((pendingPoke, pendingIndex) => (
-                    <div key={pendingIndex}>
-                      {pendingPoke.id} {pendingPoke.name}
-                      <img src={pendingPoke.image} alt={pendingPoke.name} style={{ width: '50px', height: '50px' }} />
-                    </div>
-                  ))}
-              </td>
-              <td style={columnStyle}>
-                {/* Display only one Pokémon in the Trapped Pokemon column */}
-                {trappedPokemon &&
-                  trappedPokemon.length > 0 && (
-                    <div>
-                      {trappedPokemon[0].id} {trappedPokemon[0].name}
-                      <img src={trappedPokemon[0].image} alt={trappedPokemon[0].name} style={{ width: '50px', height: '50px' }} />
-                    </div>
-                  )}
-              </td>
-            </tr>
-          ))}
-         
-    </tbody>
-   </table>
-  
+                <button onClick={() => handleMoveToPending(pokemon)}>Let's trapped!</button>
+              </div>
+           ))
+      }
+     </div> 
+     <div>
+      <h2>Trapped Pokemon</h2>
+     {pendingPokemon.map( (pokemon, currentIndex) => (
+            <div key={currentIndex}>
+                {pokemon.name}
+                <img src={pokemon.image} alt={pokemon.name} style={{ width: '50px', height: '50px' }} />
+                <br />
+                <button onClick={() => handleMoveToTrapped(pokemon)}>I choose you!</button>
+              </div>
+           ))
+      }
+      </div> 
+      <div>
+      <h2>Transfer Pokemon</h2>
+     {trappedPokemon.map( (pokemon, currentIndex) => (
+            <div key={currentIndex}>
+                {pokemon.name}
+                <img src={pokemon.image} alt={pokemon.name} style={{ width: '50px', height: '50px' }} />
+                <br />
+                <button 
+                 onClick={() => handleMoveToWild(pokemon)}
+                >Send To Dr. Oak</button>
+              </div>
+           ))
+      } 
+     </div>
+
+   </div>
    <Pagination 
     itemsPerPage={itemsPerPage}
     totalItems  ={availablePokemon.length}
